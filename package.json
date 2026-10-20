@@ -1,0 +1,13 @@
+{
+  "name": "8puzzle-visualizer",
+  "version": "1.0.0",
+  "description": "Interactive 8-Puzzle solver visualising Depth Limited Search (DLS)",
+  "private": true,
+  "scripts": {
+    "start": "http-server . -p 8000 -c-1 -o",
+    "test": "node -e \"const P=require('./js/puzzle.js');const {dls}=require('./js/dls.js');const r=dls(P.DEFAULT_START,P.DEFAULT_GOAL,5);if(r.result!=='solution'||r.stats.moves!==5){process.exit(1)}console.log('DLS OK:',r.result,r.stats.moves,'moves')\""
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
