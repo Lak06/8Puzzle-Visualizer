@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>8-Puzzle DLS Solver</title>
+  <meta name="description" content="Interactive 8-Puzzle solver that visualises Depth Limited Search (DLS).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-md site-nav">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">8-Puzzle · DLS</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="solver.html">Solver</a></li>
+        <li class="nav-item"><a class="nav-link" href="comparison.html">Comparison</a></li>
+        <li class="nav-item"><a class="nav-link" href="algorithm.html">Algorithm Info</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<header class="band-crimson hero">
+  <div class="container">
+    <p class="eyebrow" data-site="course"></p>
+    <h1 data-site="title"></h1>
+    <dl class="id-list">
+      <div><dt>Course</dt><dd data-site="course"></dd></div>
+      <div><dt>Assignment</dt><dd>Digital Assignment 1 (Case Study)</dd></div>
+      <div><dt>Student name</dt><dd data-site="studentName"></dd></div>
+      <div><dt>Registration number</dt><dd data-site="regNo"></dd></div>
+      <div><dt>Assigned algorithm</dt><dd data-site="algorithm"></dd></div>
+    </dl>
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      <a class="btn btn-cream btn-lg" href="solver.html">Open the solver</a>
+      <a class="btn btn-line btn-lg" href="algorithm.html">How DLS works</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="section">
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-7">
+        <h2 class="h3 mb-3">The 8-Puzzle Problem</h2>
+        <div class="prose">
+          <p class="lead-text">Eight numbered tiles sit on a 3 × 3 board with one empty square. A move slides a tile next to the blank into it. The task is to turn a given start arrangement into a goal arrangement using as few, or at least some valid, moves.</p>
+          <p>As a search problem, a <b>state</b> is one arrangement of the tiles, the <b>actions</b> are Up, Down, Left and Right moves of the blank, every move costs 1, and the <b>goal test</b> compares the board with the goal state. Search algorithms explore the tree of states that grows out of the start state.</p>
+          <p>This site solves the puzzle with <b>Depth Limited Search</b>, a depth first search that stops going deeper once it reaches a chosen depth limit. You choose the start state, the goal state and the limit, then watch every node the search expands.</p>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="panel raised">
+          <p class="panel-title">Example from the assignment</p>
+          <div class="d-flex flex-wrap align-items-center gap-3">
+            <div class="text-center"><div id="home-start"></div><div class="muted small mt-1">Initial state</div></div>
+            <span class="formula" aria-hidden="true">→</span>
+            <div class="text-center"><div id="home-goal"></div><div class="muted small mt-1">Goal state</div></div>
+          </div>
+          <p class="muted small mt-3 mb-0">With a depth limit of 5, DLS finds this 5-move solution. With a limit of 4 or less it reports a cutoff.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section pt-0">
+    <h2 class="h3 mb-3">The search space</h2>
+    <div class="fact-grid">
+      <div><b>181,440</b><span>reachable states from any start</span></div>
+      <div><b>362,880</b><span>arrangements in total (9!)</span></div>
+      <div><b>2 – 4</b><span>legal moves per state (branching factor)</span></div>
+      <div><b>31</b><span>moves, the longest optimal solution</span></div>
+    </div>
+    <p class="muted mt-3 mb-0 prose">Only half of all arrangements can reach a given goal. The solver checks the inversion parity of the start and goal and tells you when no solution exists.</p>
+  </section>
+
+  <section class="section pt-0">
+    <h2 class="h3 mb-3">Where to go</h2>
+    <div class="info-grid">
+      <a class="panel text-decoration-none" href="solver.html"><h3>Solver</h3><p class="muted mb-0">Enter or generate a puzzle, set the depth limit and run, pause, step or rewind the search.</p></a>
+      <a class="panel text-decoration-none" href="comparison.html"><h3>Comparison</h3><p class="muted mb-0">Run DLS on the same puzzle at several depth limits and compare nodes, moves, time and memory.</p></a>
+      <a class="panel text-decoration-none" href="algorithm.html"><h3>Algorithm Info</h3><p class="muted mb-0">Description, working principle, advantages, limitations and complexity of DLS.</p></a>
+    </div>
+  </section>
+</main>
+<footer class="site-foot">
+  <div class="container d-flex flex-wrap justify-content-between gap-2">
+    <span><span data-site="course"></span> · <span data-site="studentName"></span> · <span data-site="regNo"></span></span>
+    <span>HTML5 · CSS3 · JavaScript (ES6) · Bootstrap 5</span>
+  </div>
+</footer>
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/puzzle.js"></script>
+<script src="js/ui.js"></script>
+<script>
+  document.getElementById('home-start').innerHTML = UI.mini(Puzzle.DEFAULT_START, 'lg');
+  document.getElementById('home-goal').innerHTML = UI.mini(Puzzle.DEFAULT_GOAL, 'lg');
+</script>
+</body>
+</html>
