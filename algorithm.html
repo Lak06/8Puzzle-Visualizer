@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DLS Algorithm Info</title>
+  <meta name="description" content="Description, working principle, advantages, limitations and complexity of Depth Limited Search.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-md site-nav">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">8-Puzzle · DLS</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="solver.html">Solver</a></li>
+        <li class="nav-item"><a class="nav-link" href="comparison.html">Comparison</a></li>
+        <li class="nav-item"><a class="nav-link" href="algorithm.html">Algorithm Info</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<header class="band-crimson page-head">
+  <div class="container">
+    <p class="eyebrow">Algorithm 3 · Uninformed search</p>
+    <h1>Depth Limited Search (DLS)</h1>
+    <p>Depth first search with a ceiling on how deep it may go.</p>
+  </div>
+</header>
+
+<main class="container section">
+  <div class="info-grid mb-4">
+    <section class="panel"><h3>Description</h3>
+      <p class="mb-0">DLS is depth first search run with a fixed depth limit <i>l</i>. The root has depth 0. A node at depth <i>l</i> is tested against the goal but never expanded, so the search cannot go down an infinitely long or very deep branch. It uses no knowledge about the goal, which makes it an uninformed search.</p></section>
+    <section class="panel"><h3>Working principle</h3>
+      <ol class="mb-0">
+        <li>Put the start node on a stack.</li>
+        <li>Pop the top node. If it is the goal, stop with a solution.</li>
+        <li>If its depth equals <i>l</i>, record a cutoff and do not expand it.</li>
+        <li>Otherwise generate its successors and push them so the first one is explored next.</li>
+        <li>Repeat until the stack is empty. Report <b>cutoff</b> if any branch was cut, otherwise <b>failure</b>.</li>
+      </ol></section>
+    <section class="panel"><h3>Advantages</h3>
+      <ul class="mb-0">
+        <li>Very low memory, only the current path and its siblings.</li>
+        <li>Never loops forever on deep or infinite branches.</li>
+        <li>Simple to implement with a stack.</li>
+        <li>Fast when the goal lies within a shallow limit.</li>
+      </ul></section>
+    <section class="panel"><h3>Limitations</h3>
+      <ul class="mb-0">
+        <li>Misses the goal if it is deeper than <i>l</i>.</li>
+        <li>A good limit must be guessed, or found by trial.</li>
+        <li>May return a long path even when a shorter one exists.</li>
+        <li>Without repeated-state checks it re-expands the same boards many times.</li>
+      </ul></section>
+  </div>
+
+  <h2 class="h4 mb-3">Properties</h2>
+  <div class="fact-grid mb-4">
+    <div><b class="formula">O(b<sup>l</sup>)</b><span>Time complexity, b = branching factor, l = depth limit</span></div>
+    <div><b class="formula">O(b·l)</b><span>Space complexity</span></div>
+    <div><b class="formula">If l ≥ d</b><span>Completeness: complete only when the shallowest goal depth d is within the limit</span></div>
+    <div><b class="formula">No</b><span>Optimality: the first solution found is not guaranteed to be the shortest</span></div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <h2 class="h4 mb-3">Pseudocode</h2>
+<pre class="code">function DLS(start, goal, l):
+    stack ← [ (start, depth 0) ]
+    cutoff ← false
+    while stack is not empty:
+        node ← stack.pop()
+        if node.state = goal: return SOLUTION(node)
+        if node.depth = l:
+            cutoff ← true          # do not expand
+        else:
+            for each move in [Up, Down, Left, Right]:
+                child ← apply(move, node)
+                stack.push(child)  # first move on top
+    return cutoff ? CUTOFF : FAILURE</pre>
+    </div>
+    <div class="col-lg-6">
+      <h2 class="h4 mb-3">On the 8-puzzle</h2>
+      <div class="prose">
+        <ul>
+          <li>The blank has 2, 3 or 4 moves, so b is about 2.7 on average and at most 4.</li>
+          <li>Moves are tried in the order Up, Down, Left, Right, which sets the order of the search.</li>
+          <li>The 5-move example from the assignment needs <i>l</i> ≥ 5. With <i>l</i> = 4 the search returns a cutoff.</li>
+          <li>Every move costs 1, so the path cost g(n) equals the node depth.</li>
+          <li>The <b>Skip repeated states</b> option keeps DLS complete for its limit while stopping it from re-expanding boards it has already seen at the same or a shallower depth.</li>
+        </ul>
+        <p class="muted mb-0">No heuristic is used. Misplaced Tiles and Manhattan Distance apply to informed searches (GBFS and A*), which are not part of this assignment.</p>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="site-foot">
+  <div class="container d-flex flex-wrap justify-content-between gap-2">
+    <span><span data-site="course"></span> · <span data-site="studentName"></span> · <span data-site="regNo"></span></span>
+    <span>HTML5 · CSS3 · JavaScript (ES6) · Bootstrap 5</span>
+  </div>
+</footer>
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="js/common.js"></script>
+</body></html>
