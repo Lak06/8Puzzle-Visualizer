@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DLS Comparison</title>
+  <meta name="description" content="Compare Depth Limited Search on one puzzle at several depth limits.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-md site-nav">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">8-Puzzle · DLS</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="solver.html">Solver</a></li>
+        <li class="nav-item"><a class="nav-link" href="comparison.html">Comparison</a></li>
+        <li class="nav-item"><a class="nav-link" href="algorithm.html">Algorithm Info</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<header class="band-crimson page-head">
+  <div class="container">
+    <p class="eyebrow">Performance</p>
+    <h1>Comparison</h1>
+    <p>Depth Limited Search depends on one choice, the limit. This page runs DLS on the same puzzle at several limits so you can see where it starts to succeed and what each limit costs.</p>
+  </div>
+</header>
+
+<main class="container section">
+  <div class="panel raised mb-4">
+    <div class="row g-4 align-items-center">
+      <div class="col-md-auto"><div class="step-caption mb-1">Initial state</div><div id="cmp-start"></div></div>
+      <div class="col-md-auto"><div class="step-caption mb-1">Goal state</div><div id="cmp-goal"></div></div>
+      <div class="col-md">
+        <label for="limits">Depth limits to test (comma separated)</label>
+        <input type="text" class="form-control mb-2" id="limits" value="1, 2, 3, 4, 5, 6, 8, 10, 12">
+        <div class="d-flex flex-wrap align-items-center gap-3">
+          <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" id="cmp-skip" checked>
+            <label class="form-check-label" for="cmp-skip" style="color:var(--text)">Skip repeated states</label>
+          </div>
+          <button class="btn btn-cream" id="btn-compare" type="button">Run comparison</button>
+          <a class="btn btn-line" href="solver.html">Change puzzle in the solver</a>
+        </div>
+        <div id="cmp-msg" class="msg mt-2" role="status"></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="h4 mb-3">DLS at different depth limits</h2>
+  <div class="table-wrap mb-2">
+    <table class="data-table" id="cmp-table">
+      <thead><tr><th>Depth limit</th><th>Outcome</th><th>Solution found</th><th>Nodes generated</th><th>Nodes expanded</th><th>Moves</th><th>Time</th><th>Memory</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="input-hint">Memory is an estimate: the peak frontier plus the explored table, at about 72 bytes per node. Low is under 50 KB, Medium is under 500 KB, High is above that. A search that hits the 200,000 node safety cap is shown as Aborted.</p>
+
+  <div class="row g-4 mt-1">
+    <div class="col-lg-6">
+      <div class="panel">
+        <p class="panel-title">Nodes expanded by depth limit</p>
+        <div class="bars" id="bars"></div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="panel prose">
+        <p class="panel-title">How to read this</p>
+        <ul class="mb-0">
+          <li><b>Cutoff</b> means the limit was too small. Some branches were stopped at depth l and a deeper solution may exist.</li>
+          <li><b>Failure</b> means every state within reach was searched and the goal is not among them.</li>
+          <li>The first limit that finds a solution is at least the optimal depth. A larger limit may return a longer path than needed, because DLS is not optimal.</li>
+          <li>Work grows quickly with the limit, roughly b<sup>l</sup> without repeated-state checking.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p class="muted mt-4 mb-0 prose">Only Depth Limited Search is implemented on this site, as assigned for this registration number, so the table compares DLS with itself across limits instead of against other algorithms.</p>
+</main>
+<footer class="site-foot">
+  <div class="container d-flex flex-wrap justify-content-between gap-2">
+    <span><span data-site="course"></span> · <span data-site="studentName"></span> · <span data-site="regNo"></span></span>
+    <span>HTML5 · CSS3 · JavaScript (ES6) · Bootstrap 5</span>
+  </div>
+</footer>
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/puzzle.js"></script>
+<script src="js/dls.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/comparison.js"></script>
+</body>
+</html>
