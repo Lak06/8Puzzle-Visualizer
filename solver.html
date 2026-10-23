@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DLS Solver</title>
+  <meta name="description" content="Set up an 8-puzzle, choose a depth limit and watch Depth Limited Search step by step.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-md site-nav">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">8-Puzzle · DLS</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="solver.html">Solver</a></li>
+        <li class="nav-item"><a class="nav-link" href="comparison.html">Comparison</a></li>
+        <li class="nav-item"><a class="nav-link" href="algorithm.html">Algorithm Info</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<header class="band-crimson page-head">
+  <div class="container">
+    <p class="eyebrow">Depth Limited Search</p>
+    <h1>Solver</h1>
+    <p>Set the start and goal states, pick a depth limit, then run. Pause at any point and move one step at a time in either direction.</p>
+  </div>
+</header>
+
+<main class="container section">
+  <div class="row g-4">
+    <!-- Setup column -->
+    <div class="col-xl-4 col-lg-5">
+      <div class="panel raised mb-3">
+        <p class="panel-title">1 · Puzzle input</p>
+        <div class="d-flex flex-wrap gap-4">
+          <div>
+            <label for="s0" class="d-block">Initial state</label>
+            <div class="grid-input" id="start-grid" role="group" aria-label="Initial state"></div>
+          </div>
+          <div>
+            <label for="g0" class="d-block">Goal state</label>
+            <div class="grid-input" id="goal-grid" role="group" aria-label="Goal state"></div>
+          </div>
+        </div>
+        <p class="input-hint">Type 1 to 8 once each. Leave one cell empty, or type <code>_</code> or <code>0</code>, for the blank.</p>
+        <hr style="border-color:var(--line)">
+        <div class="row g-2 align-items-end">
+          <div class="col-6">
+            <label for="scramble">Random scramble length</label>
+            <input type="number" class="form-control" id="scramble" min="2" max="30" value="8">
+          </div>
+          <div class="col-6">
+            <button class="btn btn-line w-100" id="btn-random" type="button">Generate Random Puzzle</button>
+          </div>
+        </div>
+        <p class="input-hint mb-0">A random puzzle is made by sliding tiles away from the goal, so it is always solvable. The shortest solution is at most the scramble length.</p>
+      </div>
+
+      <div class="panel raised mb-3">
+        <p class="panel-title">2 · Algorithm</p>
+        <label for="algo">Algorithm</label>
+        <select class="form-select mb-3" id="algo" aria-describedby="algo-note">
+          <option value="dls" selected>DLS · Depth Limited Search</option>
+        </select>
+        <p id="algo-note" class="input-hint mt-0">This site implements the algorithm assigned to this registration number, Depth Limited Search.</p>
+        <label for="limit">Depth limit (l)</label>
+        <input type="number" class="form-control mb-3" id="limit" min="0" max="40" value="5">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="skip" checked>
+          <label class="form-check-label" for="skip" style="color:var(--text)">Skip repeated states</label>
+        </div>
+        <p class="input-hint mb-0">Skips a state that is already on the current path or was already expanded at the same or a shallower depth. Turn it off to see plain tree-search DLS, which can generate far more nodes.</p>
+      </div>
+
+      <div class="panel raised">
+        <p class="panel-title">3 · Controls</p>
+        <div class="controls mb-3">
+          <button class="btn btn-cream" id="btn-run" type="button">Run</button>
+          <button class="btn btn-line" id="btn-pause" type="button" disabled>Pause</button>
+          <button class="btn btn-line" id="btn-resume" type="button" disabled>Resume</button>
+        </div>
+        <div class="controls mb-3">
+          <button class="btn btn-line" id="btn-prev" type="button">Previous Step</button>
+          <button class="btn btn-line" id="btn-next" type="button">Next Step</button>
+          <button class="btn btn-line" id="btn-end" type="button">Skip to End</button>
+          <button class="btn btn-crimson" id="btn-reset" type="button">Reset</button>
+        </div>
+        <label for="speed" class="d-flex justify-content-between"><span>Change speed</span><span class="mono" id="speed-label">600 ms / step</span></label>
+        <input type="range" class="form-range" id="speed" min="1" max="10" value="6">
+        <div id="msg" class="msg mt-2" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Visualisation column -->
+    <div class="col-xl-8 col-lg-7">
+      <div class="panel raised mb-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+          <p class="panel-title mb-0">Puzzle visualisation</p>
+          <span><span class="phase" id="phase">Ready</span> <span class="step-caption ms-2" id="caption">Press Run to start</span></span>
+        </div>
+        <div class="d-flex flex-wrap gap-4 align-items-start">
+          <div><div class="step-caption mb-1">Initial state</div><div id="board-start"></div></div>
+          <div><div class="step-caption mb-1">Goal state</div><div id="board-goal"></div></div>
+          <div>
+            <div class="step-caption mb-1">Current state <span id="move-label"></span></div>
+            <div class="board" id="board-current" style="--board-size:min(15rem,78vw)" aria-label="Current state"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel mb-3">
+        <p class="panel-title">Search process (live)</p>
+        <dl class="stat-list" id="stats">
+          <div><dt>Current node</dt><dd id="st-current">–</dd></div>
+          <div><dt>Parent node</dt><dd id="st-parent">–</dd></div>
+          <div><dt>Current depth</dt><dd id="st-depth">0</dd></div>
+          <div><dt>Path cost g(n)</dt><dd id="st-cost">0</dd></div>
+          <div><dt>Nodes generated</dt><dd id="st-gen">0</dd></div>
+          <div><dt>Nodes expanded</dt><dd id="st-exp">0</dd></div>
+          <div><dt>Frontier size</dt><dd id="st-front">0</dd></div>
+          <div><dt>Explored size</dt><dd id="st-expl">0</dd></div>
+          <div><dt>Max depth reached</dt><dd id="st-max">0</dd></div>
+          <div><dt>Depth limit</dt><dd id="st-limit">–</dd></div>
+        </dl>
+        <p class="input-hint">DLS is uninformed, so there is no heuristic h(n) or evaluation function f(n). Path cost is the number of moves from the start, g(n) = depth.</p>
+      </div>
+
+      <div class="panel mb-3">
+        <p class="panel-title">Generated successor states</p>
+        <div class="strip" id="succ"><span class="empty">Successors of the node being expanded appear here.</span></div>
+        <div class="legend mt-3">
+          <span><i class="n"></i>pushed on frontier</span>
+          <span><i class="r"></i>repeated state, skipped</span>
+          <span><i class="c"></i>cut off at depth limit</span>
+          <span><i class="g"></i>goal reached</span>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <div class="panel h-100">
+            <p class="panel-title">Frontier (open list, a stack)</p>
+            <div class="chips" id="frontier"><span class="empty">Empty</span></div>
+            <p class="input-hint mb-0">Top of the stack is first. Showing up to 8 nodes, with their depth.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="panel h-100">
+            <p class="panel-title">Explored (closed list)</p>
+            <div class="chips" id="explored"><span class="empty">Empty</span></div>
+            <p class="input-hint mb-0">Most recently explored node is last. Showing the latest 8.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel mb-3" id="path-panel" hidden>
+        <p class="panel-title">Final solution path</p>
+        <div class="path-strip" id="path-strip"></div>
+      </div>
+
+      <div class="panel raised" id="summary-panel" hidden>
+        <p class="panel-title">Solution summary</p>
+        <div class="mb-3" id="summary-head"></div>
+        <dl class="stat-list" id="summary"></dl>
+        <p class="input-hint mb-0" id="summary-note"></p>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="site-foot">
+  <div class="container d-flex flex-wrap justify-content-between gap-2">
+    <span><span data-site="course"></span> · <span data-site="studentName"></span> · <span data-site="regNo"></span></span>
+    <span>HTML5 · CSS3 · JavaScript (ES6) · Bootstrap 5</span>
+  </div>
+</footer>
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/puzzle.js"></script>
+<script src="js/dls.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/solver.js"></script>
+</body>
+</html>
